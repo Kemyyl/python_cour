@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-12-15T12:18:27.890790",
+  "systeme": {
+    "os": "Windows",
+    "version": "11",
+    "architecture": "AMD64",
+    "hostname": "Kemyl"
+  },
+  "cpu": {
+    "coeurs_physiques": 10,
+    "coeurs_logiques": 16,
+    "utilisation": 16.7
+  },
+  "memoire": {
+    "total": 34049945600,
+    "disponible": 16987578368,
+    "pourcentage": 50.1
+  },
+  "disques": [
+    {
+      "point_montage": "C:\\",
+      "total": 485639581696,
+      "utilise": 441124085760,
+      "pourcentage": 90.8
+    },
+    {
+      "point_montage": "G:\\",
+      "total": 485639581696,
+      "utilise": 443349864448,
+      "pourcentage": 91.3
+    }
+  ]
+}

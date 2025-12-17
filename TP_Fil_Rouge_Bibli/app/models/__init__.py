@@ -1,2 +1,2 @@
-from .author import Author, AuthorCreate, AuthorRead
-from .book import Book, BookCreate, BookRead
+from .author import Author
+from .book import Book

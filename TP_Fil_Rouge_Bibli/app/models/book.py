@@ -1,10 +1,12 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
-class BookCategory(str, Enum):
-    """Catégories littéraires"""
+if TYPE_CHECKING:
+    from app.models.author import Author
 
+
+class BookCategory(str, Enum):
     FICTION = "Fiction"
     SCIENCE = "Science"
     HISTOIRE = "Histoire"
@@ -16,30 +18,24 @@ class BookCategory(str, Enum):
     BD = "BD"
     AUTRE = "Autre"
 
-class BookBase(SQLModel):
+
+class Book(SQLModel, table=True):
+    __tablename__ = "books"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
     title: str = Field(index=True)
-    isbn: str = Field(unique=True, index=True, max_length=17)
+    isbn: str = Field(index=True, max_length=17, unique=True)
     publication_year: int
+
     author_id: int = Field(foreign_key="authors.id", index=True)
+
     available_copies: int = Field(default=0, ge=0)
     total_copies: int = Field(gt=0)
-    description: Optional[str] = Field(default=None)
+
+    description: Optional[str] = None
     category: BookCategory = Field(default=BookCategory.AUTRE)
-    language: str = Field(max_length=2)  # Code langue ISO
+    language: str = Field(max_length=2)
     pages: int = Field(gt=0)
     publisher: str
 
-class Book(BookBase, table=True):
-    "Modèle de données pour un livre"
-    
-    __tablename__ = "books"
-    
-    id: Optional[int] = Field(default=None, primary_key=True)
-    
     author: Optional["Author"] = Relationship(back_populates="books")
-
-class BookCreate(BookBase):
-    pass
-
-class BookRead(BookBase):
-    id: int

@@ -1,8 +1,9 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, func, select
 
 from app.database import get_session
-from app.models.book import Book
+from app.models.book import Book, BookCategory
 from app.models.author import Author
 from app.schemas.book import BookCreate, BookRead, BookUpdate
 from app.schemas.common import PaginatedResponse
@@ -12,17 +13,35 @@ router = APIRouter(prefix="/books", tags=["Livres"])
 
 @router.post("/", response_model=BookRead, status_code=201)
 def create_book(book: BookCreate, session: Session = Depends(get_session)):
-    # Vérifier auteur
+
     author = session.get(Author, book.author_id)
     if not author:
         raise HTTPException(status_code=404, detail="Auteur inexistant")
 
-    # Vérifier ISBN unique
     existing = session.exec(select(Book).where(Book.isbn == book.isbn)).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Un livre avec cet ISBN existe déjà")
-
+        raise HTTPException(status_code=400, detail=f"Un livre avec l'ISBN {book.isbn} existe déjà")
+    
+    if len(book.isbn) > 13:
+        raise HTTPException(status_code=400, detail="L'ISBN ne doit pas dépasser 13 caractères")
+    
+    if not book.isbn.isdigit():
+        raise HTTPException(status_code=400, detail="L'ISBN doit contenir uniquement des chiffres")
+    
+    existing = session.exec(select(Book).where(Book.language == book.language)).first()
+    if len(book.language) > 2:
+        raise HTTPException(status_code=400, detail="Le code langue ne doit pas dépasser 2 caractères")
+    
+    existing = session.exec(select(Book).where(Book.publication_year == book.publication_year)).first()
+    if book.publication_year < 1450 or book.publication_year > date.today().year:
+        raise HTTPException(status_code=400, detail=f"La année de publication doit être comprise entre 1450 et {date.today().year}")
+    
+    existing = session.exec(select(Book).where(Book.category == book.category)).first()
+    if book.category not in BookCategory.__members__.values():
+        raise HTTPException(status_code=400, detail="Catégorie de livre invalide il doit être parmi les suivantes : " + ", ".join([cat.value for cat in BookCategory]))
+    
     db_book = Book.model_validate(book)
+    
     session.add(db_book)
     session.commit()
     session.refresh(db_book)

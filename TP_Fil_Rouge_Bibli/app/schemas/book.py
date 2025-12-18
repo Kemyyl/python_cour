@@ -18,17 +18,14 @@ class BookCategory(str, Enum):
 
 class BookCreate(SQLModel):
     title: str
-    isbn: str = Field(max_length=17)
+    isbn: str
     publication_year: int
-
     author_id: int
-
     available_copies: int = Field(default=0, ge=0)
     total_copies: int = Field(gt=0)
-
     description: Optional[str] = None
-    category: BookCategory = BookCategory.AUTRE
-    language: str = Field(max_length=2)
+    category: str
+    language: str
     pages: int = Field(gt=0)
     publisher: str
 
@@ -39,14 +36,11 @@ class BookRead(BookCreate):
 
 class BookUpdate(SQLModel):
     title: Optional[str] = None
-    isbn: Optional[str] = Field(default=None, max_length=17)
+    isbn: Optional[str] = Field(default=None, max_length=13)
     publication_year: Optional[int] = None
-
     author_id: Optional[int] = None
-
     available_copies: Optional[int] = Field(default=None, ge=0)
     total_copies: Optional[int] = Field(default=None, gt=0)
-
     description: Optional[str] = None
     category: Optional[BookCategory] = None
     language: Optional[str] = Field(default=None, max_length=2)

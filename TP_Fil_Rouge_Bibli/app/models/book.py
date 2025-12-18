@@ -23,19 +23,15 @@ class Book(SQLModel, table=True):
     __tablename__ = "books"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    title: str = Field(index=True)
-    isbn: str = Field(index=True, max_length=17, unique=True)
-    publication_year: int
-
     author_id: int = Field(foreign_key="authors.id", index=True)
-
+    title: str = Field(index=True)
+    isbn: str = Field(index=True, unique=True)
+    publication_year: int
     available_copies: int = Field(default=0, ge=0)
     total_copies: int = Field(gt=0)
-
     description: Optional[str] = None
-    category: BookCategory = Field(default=BookCategory.AUTRE)
-    language: str = Field(max_length=2)
+    category: str
+    language: str
     pages: int = Field(gt=0)
     publisher: str
-
     author: Optional["Author"] = Relationship(back_populates="books")
